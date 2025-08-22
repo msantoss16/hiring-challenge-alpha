@@ -8,6 +8,7 @@
 import {
   searchInternet,
   executeInternetSearch,
+  setAutoApprove,
 } from "./src/functions/internetSearch.ts";
 import chalk from "chalk";
 
@@ -468,6 +469,12 @@ function displayFinalReport() {
 async function runAllTests() {
   try {
     console.log(chalk.cyan("🔧 Iniciando testes de pesquisa na internet...\n"));
+
+    // Ativa aprovação automática para comandos bash durante os testes
+    setAutoApprove(true);
+    console.log(
+      chalk.green("✅ Aprovação automática de comandos bash ativada\n")
+    );
 
     const categories = Object.keys(TEST_CATEGORIES);
 

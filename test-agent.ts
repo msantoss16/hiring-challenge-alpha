@@ -8,6 +8,7 @@
 import { buildAgentGraph } from "./src/graph.ts";
 import { initDocsSearch } from "./src/functions/docsSearch.ts";
 import { initSql } from "./src/functions/sqliteFunction.ts";
+import { setAutoApprove } from "./src/functions/internetSearch.ts";
 import chalk from "chalk";
 
 console.log(chalk.cyan.bold("🧪 TESTE AVANÇADO DO AGENTE MULTI-FONTE\n"));
@@ -155,6 +156,12 @@ async function initializeDataSources() {
   console.log(chalk.cyan("🔧 Inicializando fontes de dados..."));
 
   try {
+    // Ativa aprovação automática para comandos bash durante os testes
+    setAutoApprove(true);
+    console.log(
+      chalk.green("✅ Aprovação automática de comandos bash ativada")
+    );
+
     await initDocsSearch();
     initSql();
     console.log(chalk.green("✅ Fontes de dados inicializadas com sucesso"));

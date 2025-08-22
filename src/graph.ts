@@ -70,7 +70,7 @@ const toolNode = new RunnableLambda({
     if (useSQL) {
       const sql = await sqlQuery(state.question);
       evidences.push({ type: "SQL", sql });
-      citations.push("sqlite:data/app.db");
+      citations.push("sqlite:data/music.db");
     }
 
     if (useDOCS) {

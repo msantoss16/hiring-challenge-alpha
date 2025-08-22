@@ -4,9 +4,13 @@ import { CONFIG } from "./AgentConfigs/config.ts";
 import { initDocsSearch } from "./functions/docsSearch.ts";
 import { buildAgentGraph } from "./graph.ts";
 import { initSql } from "./functions/sqliteFunction.ts";
+import { resetUserApproval } from "./functions/internetSearch.ts";
 
 // 🔹 Inicializa embeddings e banco SQLite
 (async () => {
+  // Reseta aprovação do usuário para nova sessão
+  resetUserApproval();
+
   try {
     await initDocsSearch(); // indexa documentos
     console.log(chalk.green("Documentos indexados com sucesso!"));

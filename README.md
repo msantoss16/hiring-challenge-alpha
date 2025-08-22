@@ -19,13 +19,13 @@ O agente utiliza **LangChain** e **LangGraph** para orquestrar um fluxo intelige
 - **Sistema de fallback**: Se uma fonte falha, tenta alternativas
 - **Pontuação de confiança**: Mostra o nível de confiança das respostas
 
-### 🔧 Fontes de Dados
+### Fontes de Dados
 
 - **SQLite**: Consultas estruturadas em bancos `.db`
 - **Documentos**: Busca semântica em arquivos `.txt`
 - **Internet**: Pesquisa em tempo real via comandos bash
 
-### 🛡️ Segurança e Controle
+### Segurança e Controle
 
 - **Aprovação de comandos**: Comandos bash requerem aprovação
 - **Transparência**: Mostra quais fontes foram utilizadas
@@ -74,7 +74,7 @@ npm run dev
 
 Após executar `npm run dev`, você verá uma interface colorida onde você pode fazer perguntas
 
-## 🧪 Sistema de Testes
+## Sistema de Testes
 
 O projeto inclui um sistema de testes avançado para validar todas as funcionalidades:
 
@@ -159,7 +159,7 @@ OPENAI_MODEL=gpt-4o-mini          # Modelo OpenAI (padrão: gpt-4o-mini pq é ma
 ```bash
 > Verifique o que há no banco de dados
 
-✅ Resultado:
+Resultado:
 O banco de dados contém informações sobre música, incluindo:
 - Tabela 'artists' com 275 artistas
 - Tabela 'albums' com 347 álbuns

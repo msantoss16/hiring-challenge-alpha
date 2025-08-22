@@ -7,14 +7,16 @@
     "dev": "tsx src/index.ts",
     "build": "tsc -p tsconfig.json",
     "docs": "typedoc --out docs src",
+    "test": "node test-agent.js",
+    "test:internet": "node test-internet-search.js",
     "test:docs": "tsx test-docs-embed.ts",
     "start": "node dist/index.js"
   },
   "dependencies": {
     "@langchain/community": "^0.3.53",
     "@langchain/core": "^0.3.72",
-    "@langchain/langgraph": "^0.0.30",
-    "@langchain/openai": "^0.3.0",
+    "@langchain/langgraph": "^0.4.6",
+    "@langchain/openai": "^0.6.9",
     "better-sqlite3": "^9.0.0",
     "chalk": "^5.6.0",
     "compromise": "^14.14.4",

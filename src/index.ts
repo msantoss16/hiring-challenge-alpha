@@ -1,70 +1,30 @@
-import OpenAI from "openai";
 import readline from "readline";
-import chalk from "chalk"; // 🔹 Importa o chalk
-import { CONFIG } from "./config.ts";
-import { querySQLite } from "./functions/sqliteFunction.ts";
-import { embedDocuments, searchWithEmbeddings } from "./functions/docsEmbed.ts";
+import chalk from "chalk";
+import { CONFIG } from "./AgentConfigs/config.ts";
+import { initDocsSearch } from "./functions/docsSearch.ts";
+import { buildAgentGraph } from "./graph.ts";
+import { initSql } from "./functions/sqliteFunction.ts";
 
-const client = new OpenAI({ apiKey: CONFIG.openaiApiKey });
-
-// 🔹 Função principal do agente
-export async function runAgent(question: string) {
-  console.log(chalk.blue("Pergunta recebida:"), question);
-
-  // 1️⃣ SQL
-  if (question.trim().toLowerCase().startsWith("select")) {
-    const result = await querySQLite(question);
-    if (result && result.length > 0) {
-      console.log(chalk.yellow("Fonte usada: SQLite"));
-      return chalk.green(
-        `Resultado da consulta SQL:\n${JSON.stringify(result, null, 2)}`
-      );
-    }
-    console.log(
-      chalk.yellow("SQL não retornou resultados, tentando embeddings...")
-    );
-  }
-
-  // 2️⃣ Documentos com embeddings com score para garantir q é util
-  const docResults = await searchWithEmbeddings(question, 2, 0.7);
-  if (docResults.length > 0) {
-    console.log(chalk.yellow("Fonte usada: Embeddings"));
-    return chalk.green(
-      `Encontrei nos documentos:\n\n${docResults.join("\n---\n")}`
-    );
-  }
-
-  // 3️⃣ Se nada encontrado → usa LLM direto
-  console.log(
-    chalk.yellow("Nenhum documento encontrado, usando LLM diretamente...")
-  );
-  const response = await client.chat.completions.create({
-    model: CONFIG.modelName,
-    messages: [
-      {
-        role: "system",
-        content:
-          "Você é um assistente inteligente que responde com base em documentos, banco de dados ou conhecimento geral.",
-      },
-      { role: "user", content: question },
-    ],
-  });
-
-  console.log(chalk.yellow("Fonte usada: LLM"));
-  return chalk.green(
-    response.choices[0]?.message?.content ?? "Não consegui gerar resposta."
-  );
-}
-
-// 🔹 Inicializa embeddings e abre CLI interativo
+// 🔹 Inicializa embeddings e banco SQLite
 (async () => {
   try {
-    await embedDocuments();
+    await initDocsSearch(); // indexa documentos
     console.log(chalk.green("Documentos indexados com sucesso!"));
   } catch (err) {
     console.error(chalk.red("Erro ao indexar documentos:"), err);
   }
 
+  try {
+    initSql(); // conecta ao banco via better-sqlite3
+    console.log(chalk.green("Banco SQLite inicializado com sucesso!"));
+  } catch (err) {
+    console.error(chalk.red("Erro ao inicializar banco SQLite:"), err);
+  }
+
+  // Cria o grafo do agente
+  const agentGraph = buildAgentGraph();
+
+  // Abre CLI interativo
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -73,13 +33,32 @@ export async function runAgent(question: string) {
   console.log(chalk.cyan("\nDigite sua pergunta (ou 'sair' para encerrar):"));
 
   rl.on("line", async (input) => {
-    if (input.trim().toLowerCase() === "sair") {
+    const question = input.trim();
+    if (question.toLowerCase() === "sair") {
       rl.close();
       return;
     }
 
-    const resposta = await runAgent(input);
-    console.log("\n" + resposta);
+    console.log(chalk.blue("Pergunta recebida:"), question);
+
+    try {
+      // Invoca o grafo do agente
+      const result = await agentGraph.invoke({ question });
+
+      // Exibe informações de fontes utilizadas
+      if (result.citations && result.citations.length > 0) {
+        console.log(
+          chalk.yellow(`Fontes utilizadas: ${result.citations.join(", ")}`)
+        );
+      }
+
+      console.log(
+        "\n" + chalk.green(result.finalAnswer || "Não consegui gerar resposta.")
+      );
+    } catch (error: any) {
+      console.error(chalk.red("Erro na execução do agente:"), error);
+    }
+
     console.log(chalk.cyan("\nPergunte outra coisa ou digite 'sair'..."));
   });
 })();

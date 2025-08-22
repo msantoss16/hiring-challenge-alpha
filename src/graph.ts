@@ -8,7 +8,7 @@ import {
   SYSTEM_ANSWERER,
 } from "./AgentConfigs/prompts.ts";
 import { searchDocs } from "./functions/docsSearch.ts";
-import { sqlQuery } from "./functions/sqliteFunction.ts";
+import { queryAllDBs } from "./functions/sqliteFunction.ts";
 import { searchInternet } from "./functions/internetSearch.ts";
 
 // --- Schema do estado com Zod ---
@@ -56,33 +56,63 @@ const routeNode = new RunnableLambda({
 });
 
 // executor de ferramentas
-const toolNode = new RunnableLambda({
+export const toolNode = new RunnableLambda({
   func: async (state: any) => {
     const evidences: any[] = [];
     const citations: string[] = [];
 
-    // se WEB estiver nas rotas, força combinar com SQL e DOCS
     const routes = state.routes ?? [];
     const useSQL = routes.includes("SQL") || routes.includes("WEB");
     const useDOCS = routes.includes("DOCS") || routes.includes("WEB");
     const useWEB = routes.includes("WEB");
 
+    // ---------------- SQL: percorre todos os DBs ----------------
     if (useSQL) {
-      const sql = await sqlQuery(state.question);
-      evidences.push({ type: "SQL", sql });
-      citations.push("sqlite:data/music.db");
+      try {
+        const dbResults = await queryAllDBs();
+        let fontes: string[] = [];
+        for (const dbResult of dbResults) {
+          if (!fontes.includes(dbResult.db)) {
+            fontes.push(dbResult.db);
+          }
+          if (dbResult.tables) {
+            for (const table of dbResult.tables) {
+              evidences.push({
+                type: "SQL",
+                db: dbResult.db,
+                table: table.table,
+                rows: table.rows,
+              });
+            }
+          } else if (dbResult.error) {
+            evidences.push({
+              type: "SQL",
+              db: dbResult.db,
+              error: dbResult.error,
+            });
+          }
+        }
+        fontes.forEach((f) => {
+          citations.push(`sqlite:${f}`);
+        });
+      } catch (err) {
+        console.error("[SQL] Erro ao buscar múltiplos DBs:", err);
+      }
     }
 
+    // ---------------- DOCS ----------------
     if (useDOCS) {
       const snippets = await searchDocs(state.question, 3);
       evidences.push({ type: "DOCS", snippets });
       citations.push("docs:local");
     }
 
+    // ---------------- WEB ----------------
     if (useWEB) {
       const web = await searchInternet(state.question);
-      evidences.push({ type: "WEB", web });
-      citations.push("internet");
+      evidences.push({ type: "WEB", web: web.text || "" });
+      if (web.sources?.length) citations.push(...web.sources);
+      else citations.push("internet");
     }
 
     return { ...state, evidences, citations };

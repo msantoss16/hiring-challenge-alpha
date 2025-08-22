@@ -1,84 +1,209 @@
-# Multi-Source AI Agent Challenge
+# Agente Multi-Fonte com IA
 
-## Challenge Overview
+## Sobre o Projeto
 
-Welcome to the Multi-Source AI Agent Challenge! In this project, you'll build an intelligent agent using Node.js and modern LLM frameworks that can answer questions by leveraging multiple data sources including SQLite databases, document files, and web content via bash commands.
+Este é um **agente inteligente multi-fonte** desenvolvido em Node.js que utiliza inteligência artificial para responder perguntas combinando informações de múltiplas fontes de dados:
 
-## Challenge Requirements
+- **Banco de dados SQLite** - Consultas estruturadas
+- **Documentos locais** - Busca em arquivos de texto
+- **Pesquisa na internet** - Dados em tempo real via comandos bash
 
-### Technology Stack
-- Node.js
-- [LangChain](https://js.langchain.com/docs/) - For LLM integration and chains
-- [LangGraph](https://js.langchain.com/docs/langgraph/) - For agent workflow orchestration
+O agente utiliza **LangChain** e **LangGraph** para orquestrar um fluxo inteligente que decide automaticamente qual fonte de dados é mais apropriada para cada pergunta, podendo combinar múltiplas fontes quando necessário.
 
-### Core Features
-Your AI agent must be able to:
+## Funcionalidades Principais
 
-1. **Answer questions using multiple data sources:**
-   - **SQLite databases**: The agent should query `.db` files placed in the `data/sqlite` folder
-   - **Document context**: The agent should extract information from `.txt` files in the `data/documents` folder
-   - **External data**: The agent should be able to run bash commands (with user approval) to gather additional data (e.g., using `curl` to fetch web content)
+### Inteligência Multi-Fonte
 
-2. **Implement a conversational interface** - either in the browser or terminal
+- **Roteamento inteligente**: Decide automaticamente qual fonte usar
+- **Combinação de fontes**: Integra informações de múltiplas origens
+- **Sistema de fallback**: Se uma fonte falha, tenta alternativas
+- **Pontuação de confiança**: Mostra o nível de confiança das respostas
 
-3. **Provide intelligent routing** - decide which data source is most appropriate for each question and use the right tools accordingly
+### 🔧 Fontes de Dados
 
-### Minimum Viable Product
-Your solution must demonstrate:
+- **SQLite**: Consultas estruturadas em bancos `.db`
+- **Documentos**: Busca semântica em arquivos `.txt`
+- **Internet**: Pesquisa em tempo real via comandos bash
 
-- A functional agent that can respond to user questions
-- Proper routing between different data sources
-- A clear execution flow with user approval for bash commands
-- Meaningful responses that integrate information from multiple sources when needed
+### 🛡️ Segurança e Controle
 
-## Submission Guidelines
+- **Aprovação de comandos**: Comandos bash requerem aprovação
+- **Transparência**: Mostra quais fontes foram utilizadas
+- **Métricas de execução**: Tempo de resposta e fontes citadas
 
-1. Fork this repository
-2. Implement your solution
-3. Submit a pull request with your implementation
-4. Include detailed instructions on how to run and test your solution
-5. Your code must be 100% functional
+## Como Usar
 
-## Evaluation Criteria
+### 1. Instalação
 
-Your submission will be evaluated based on:
+```bash
+# Clone o repositório
+git clone <repository-url>
+cd hiring-challenge-alpha
 
-- **Functionality**: Does it work as expected? Can it correctly use all three data sources?
-- **Code Quality**: Is the code well-organized, commented, and following best practices?
-- **Error Handling**: How does the agent handle edge cases and errors?
-- **User Experience**: Is the conversation with the agent natural and helpful?
-- **Documentation**: Is the setup and usage well documented?
+# Instale as dependências
+npm install
 
-## Setup Instructions
+# Configure as variáveis de ambiente
+cp env.example .env
+# Edite .env e adicione sua chave da OpenAI
+OPENAI_API_KEY=sua_chave_aqui
+```
 
-Include detailed instructions on how to set up and run your solution. For example:
+### 2. Preparação dos Dados
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Configure environment variables (copy `.env.example` to `.env` and fill in required values)
-4. Add sample databases to the `sqlite` folder
-5. Add sample documents to the `documents` folder
-6. Start the agent: `npm start`
+```bash
+# Crie as pastas de dados
+mkdir -p data/sqlite data/documents
 
-## Testing Your Implementation
+# Adicione seus dados:
+# - Bancos SQLite (.db) em data/sqlite/
+# - Documentos (.txt) em data/documents/
+```
 
-Your README should include instructions on how to test the agent functionality, such as:
+### 3. Execução
 
-1. Sample questions that query SQLite databases
-2. Sample questions that require document context
-3. Sample questions that would trigger bash commands (and how to approve them)
-4. Examples of questions that combine multiple data sources
+```bash
+# Modo interativo
+npm run dev
 
-## Resources
+```
 
-- [LangChain JS Documentation](https://js.langchain.com/docs/)
-- [LangGraph Documentation](https://js.langchain.com/docs/langgraph/)
-- [SQLite in Node.js Guide](https://www.sqlitetutorial.net/sqlite-nodejs/)
+## Guia de Uso
 
-## License
+### Interface Interativa
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Após executar `npm run dev`, você verá uma interface colorida onde você pode fazer perguntas
+
+## 🧪 Sistema de Testes
+
+O projeto inclui um sistema de testes avançado para validar todas as funcionalidades:
+
+### **Teste Completo do Agente**
+
+```bash
+npm run test:agent
+```
+
+Executa 21+ testes categorizados (SQL, Documentos, Web, Multi-fonte)
+
+### **Testes Específicos**
+
+```bash
+npm run test:docs      # Testa apenas documentos
+npm run test:internet  # Testa apenas internet
+npm run test:all       # Todos os testes
+```
+
+### **Métricas dos Testes**
+
+- Taxa de sucesso por categoria
+- Tempo médio de execução
+- Validação de fontes utilizadas
+- Respostas detalhadas
+
+## Arquitetura do Projeto
+
+```
+src/
+├── graph.ts              # Grafo principal do agente
+├── index.ts              # Aqui que a magica acontece
+├── functions/
+│   ├── docsSearch.ts     # Busca em documentos
+│   ├── sqliteFunction.ts # Consultas SQLite
+│   └── internetSearch.ts # Pesquisa na internet com bash
+├── agentsConfigs/
+│   ├── config.ts         # Algumas configs
+│   └── prompts.ts        # Treinamento para a llm
+├── test-agents.ts        # Testes do agents
+├── test-docs-embed.ts    # Testes da busca semantica
+├── test-internet-search.ts # Testes da pesquisa na net
+```
+
+### **Fluxo de Execução**
+
+1. **Recebe pergunta** do usuário
+2. **Analisa contexto** e decide fontes apropriadas
+3. **Executa consultas** nas fontes selecionadas
+4. **Combina resultados** de múltiplas fontes
+5. **Gera resposta final** com citações das fontes
+
+## Configuração Avançada
+
+### **Variáveis de Ambiente**
+
+```bash
+OPENAI_API_KEY=sua_chave_aqui #caro ta, tem que pagar
+OPENAI_MODEL=gpt-4o-mini          # Modelo OpenAI (padrão: gpt-4o-mini pq é mais barato)
+```
+
+### **Personalização de Fontes**
+
+#### **Adicionar Novo Banco SQLite**
+
+```bash
+# Coloque o arquivo .db em data/sqlite/
+# O agente detectará automaticamente
+```
+
+#### **Adicionar Novos Documentos**
+
+```bash
+# Coloque arquivos .txt em data/documents/
+# O agente fará busca semântica no conteúdo
+```
+
+## 📊 Exemplos de Uso
+
+### **Exemplo 1: Consulta ao Banco**
+
+```bash
+> Verifique o que há no banco de dados
+
+✅ Resultado:
+O banco de dados contém informações sobre música, incluindo:
+- Tabela 'artists' com 275 artistas
+- Tabela 'albums' com 347 álbuns
+- Tabela 'tracks' com 3503 músicas
+
+ Fontes utilizadas: sqlite
+```
+
+### **Exemplo 2: Pesquisa Multi-Fonte**
+
+```bash
+> aonde nasceu karl marx
+
+Resultado:
+Karl Marx nasceu em Trier, Alemanha, e não no BRASIL, em 5 de maio de 1818.
+Ele foi um filósofo, economista e revolucionário socialista,
+fundador do marxismo junto com Friedrich Engels.
+
+Fontes utilizadas: web, docs
+```
+
+### **Exemplo 3: Combinação de Fontes**
+
+```bash
+> qual a musica mais famosa de um album presente no banco de dados
+
+Resultado:
+No banco de dados encontrei o álbum "Back In Black" do AC/DC.
+A música mais famosa deste álbum é "Back In Black", lançada em 1980,
+que se tornou um hino do rock e uma das músicas mais reconhecidas
+da história do rock and roll.
+
+Fontes utilizadas: sqlite, web
+```
+
+## Bibliotecas, fontes de pesquisa
+
+- [LangChain](https://js.langchain.com/) - Framework de IA
+- [LangGraph](https://js.langchain.com/docs/langgraph/) - Orquestração de agentes
+- [OpenAI](https://openai.com/) - Modelos de linguagem
+- [Chalk](https://github.com/chalk/chalk) - Cores no terminal
+- [Searxng](https://www.reddit.com/r/Searx/comments/1g3egc4/public_searxng_instance_that_supports_json/) - Pesquisa gratis com retorno json
+- [Embeddings](https://stackoverflow.blog/2023/11/09/an-intuitive-introduction-to-text-embeddings/) - Encuquei a cabeça com isso
 
 ---
 
-Good luck with your implementation! We're excited to see your creative solutions to this challenge.
+**🎉 Agora você tem um agente inteligente que combina múltiplas fontes de dados para responder suas perguntas de forma inteligente e contextualizada!**

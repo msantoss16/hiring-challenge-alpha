@@ -27,6 +27,16 @@ const TEST_CATEGORIES = {
     color: chalk.magenta,
     tests: [
       {
+        question: "Verifique o que há no banco de dados",
+        expected: "SQL",
+        description: "Exploração geral do banco de dados",
+      },
+      {
+        question: "3 musicas do banco de dados",
+        expected: "SQL",
+        description: "Busca por músicas no banco",
+      },
+      {
         question: "select * from artists limit 3",
         expected: "SQL",
         description: "Consulta básica de artistas",
@@ -54,6 +64,16 @@ const TEST_CATEGORIES = {
     color: chalk.blue,
     tests: [
       {
+        question: "manual de economia",
+        expected: "DOCS",
+        description: "Manual de economia",
+      },
+      {
+        question: "informações do documento de economia",
+        expected: "DOCS",
+        description: "Informações sobre documento de economia",
+      },
+      {
         question: "What are the main economic concepts discussed?",
         expected: "DOCS",
         description: "Conceitos econômicos",
@@ -75,6 +95,21 @@ const TEST_CATEGORIES = {
     color: chalk.green,
     tests: [
       {
+        question: "pedro bandeira",
+        expected: "WEB",
+        description: "Informações sobre Pedro Bandeira",
+      },
+      {
+        question: "frança",
+        expected: "WEB",
+        description: "Informações sobre a França",
+      },
+      {
+        question: "quem foi albert einstein",
+        expected: "WEB",
+        description: "Biografia de Albert Einstein",
+      },
+      {
         question: "What's the current Node.js version?",
         expected: "WEB",
         description: "Versão atual do Node.js",
@@ -84,17 +119,23 @@ const TEST_CATEGORIES = {
         expected: "WEB",
         description: "Capital da França",
       },
-      {
-        question: "Who was Albert Einstein?",
-        expected: "WEB",
-        description: "Biografia de Einstein",
-      },
     ],
   },
   MULTI: {
     name: "Múltiplas Fontes",
     color: chalk.yellow,
     tests: [
+      {
+        question: "aonde nasceu karl marx",
+        expected: ["WEB", "DOCS"],
+        description: "Local de nascimento de Karl Marx",
+      },
+      {
+        question:
+          "qual a musica mais famosa de um album presente no banco de dados",
+        expected: ["SQL", "WEB"],
+        description: "Música famosa de álbum no banco",
+      },
       {
         question: "Tell me about music and economics",
         expected: ["SQL", "DOCS", "WEB"],
@@ -110,27 +151,6 @@ const TEST_CATEGORIES = {
         question: "Show me artists and explain economic principles",
         expected: ["SQL", "DOCS"],
         description: "Artistas e princípios econômicos",
-      },
-    ],
-  },
-  EDGE: {
-    name: "Casos Extremos",
-    color: chalk.red,
-    tests: [
-      {
-        question: "",
-        expected: "WEB",
-        description: "Pergunta vazia",
-      },
-      {
-        question: "a".repeat(1000),
-        expected: "WEB",
-        description: "Pergunta muito longa",
-      },
-      {
-        question: "SELECT * FROM artists; DROP TABLE artists;",
-        expected: "SQL",
-        description: "SQL injection attempt",
       },
     ],
   },

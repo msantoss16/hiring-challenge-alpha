@@ -1,0 +1,3 @@
+Este documento trata de aprendizado de máquina e inteligência artificial.
+Termos: redes neurais, gradiente descendente, overfitting, regularização, conjuntos de dados.
+Exemplo: O overfitting ocorre quando o modelo memoriza o conjunto de treino e generaliza mal.

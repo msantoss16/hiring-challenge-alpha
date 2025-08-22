@@ -1,0 +1,3 @@
+Texto variado para testar busca semântica.
+Temas: turismo, gastronomia, cultura, esportes.
+Exemplo: A gastronomia italiana é conhecida por massas, risotos e sobremesas como tiramisù.
